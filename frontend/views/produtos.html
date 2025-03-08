@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/produtos.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Produtos</title>
+</head>
+<body>
+    <h2>Lista de Produtos</h2>
+    <button onclick="getProdutos()">Listar</button>
+    <ul id="lista-produtos">
+    
+    </ul>
+    
+
+<script>
+    function getProdutos(){
+        // Agora, o evento é diretamente no botão
+        axios.get("http://192.168.1.6/produto")
+            .then((response) => {
+                const produtos = response.data;
+                
+
+                // Limpa a lista antes de exibir os novos produtos
+                const listaProdutos = document.getElementById("lista-produtos");
+                listaProdutos.innerHTML = ""; // Limpar antes de adicionar novos produtos
+
+                // Exibe os produtos
+                produtos.forEach(produto => {
+                    const li = document.createElement("li");
+                    li.textContent = `Nome: ${produto.nome}, Descrição: ${produto.descricao}, Preço: R$ ${produto.preco}, Categoria: ${produto.categoria}`;
+                    const deleteButton = document.createElement("button");
+                    deleteButton.textContent = "Deletar";
+                    deleteButton.style.backgroundColor = "#e74c3c";
+                    deleteButton.style.color = "white";
+                    deleteButton.style.border = "none";
+                    deleteButton.style.padding = "5px 10px";
+                    deleteButton.style.marginLeft = "10px";
+                    deleteButton.style.cursor = "pointer";
+
+                    // Adiciona o evento de deletar
+                    deleteButton.addEventListener("click", () => deleteProduto(produto.id));
+
+                    // Adiciona o botão de deletar ao item da lista
+                    li.appendChild(deleteButton);
+                    listaProdutos.appendChild(li);
+                
+                   
+                });
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar produtos:", error);
+            });
+
+            function deleteProduto(id) {
+                if (confirm("Tem certeza que deseja deletar este produto?")) {
+                    axios.delete(`http://192.168.1.6/produto/${id}`)
+                        .then((response) => {
+                            console.log(response.data);
+                            alert("Produto deletado com sucesso!");
+                            getProdutos(); // Recarrega a lista de produtos
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao deletar produto:", error);
+                            alert("Erro ao deletar o produto!");
+                        });
+                }
+            }
+            
+    }
+
+
+   
+</script>
+</body>
+</html>
